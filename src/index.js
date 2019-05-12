@@ -1,5 +1,8 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
+import axios from 'axios';
+import Feed from './FeedComponent';
+import Tweet from './TweetComponent';
 
 class App extends React.Component {
     constructor(props) {
@@ -7,15 +10,37 @@ class App extends React.Component {
         this.state = { 
             username: '',
             tweet: '',
+            feed: [],
         };
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleUsername = this.handleUsername.bind(this);
         this.handleTweet = this.handleTweet.bind(this);
+        this.handleFeed = this.handleFeed.bind(this);
+        this.componentDidMount = this.componentDidMount.bind(this);
+    }
+
+    componentDidMount() {
+        this.handleFeed();
     }
 
     handleSubmit (e) {
         e.preventDefault();
-        console.log('submit button working');
+        axios.post('http://127.0.0.1:3000/twitter', {
+            username: this.state.username,
+            tweet: this.state.tweet,
+          })
+          .then( (response) => {
+            console.log(response);
+            this.handleFeed();
+          })
+          .catch( (error) => {
+            console.log(error);
+        });
+
+
+        document.getElementById('username').value = null;
+        document.getElementById('tweet').value = null;
+        
     }
 
     handleUsername (e) {
@@ -25,22 +50,25 @@ class App extends React.Component {
     handleTweet (e) {
         this.setState({ tweet: e.target.value });
     }
+
+    handleFeed () {
+        axios.get('http://127.0.0.1:3000/twitter')
+        .then( (response) => {
+            console.log(response);
+            this.setState({feed: response.data});
+        })
+        .catch( (error) => {
+            console.log(error);
+        });
+    }
     
     render () {
       return (
       <div className='container'>
         <h1>Twitter</h1>
         <form>
-            Username:<br />
-            <input id="username" type="text" name="firstname" onChange={ this.handleUsername } />
-            <br />
-            Tweet:<br />
-            <input id="tweet" type="text" name="lastname" onChange={ this.handleTweet }/>
-            <br />
-            <input type="submit" value="Submit" onClick={ this.handleSubmit } />
-            <br />
-            Feed 
-            < hr />
+            < Tweet handleUsername={this.handleUsername.bind(this)} handleTweet={this.handleTweet.bind(this)} handleSubmit={this.handleSubmit.bind(this)}/>
+            < Feed feed={this.state.feed}/>
         </form>
       </div>
       )}
