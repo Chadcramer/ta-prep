@@ -1,4 +1,10 @@
 body {
-    background-color: lightgray;
+    background-color: #1dcaff;
     text-align: center;
 }
+
+#root {
+    font-size: 30px;
+    color: #ffffff;
+}
+
